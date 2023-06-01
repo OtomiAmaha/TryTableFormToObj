@@ -32,10 +32,23 @@ public class NewTableUtils
     }
 
     //首字母大写的方法
-    public static String upFirstCode(String fromName)
+    public static String upFirstCode(String str)
     {
-        return fromName.substring(0,1).toUpperCase()
-                + fromName.substring(1);
+        return str.substring(0,1).toUpperCase()
+                + str.substring(1);
+    }
+
+    //下划线命名转化驼峰命名的方法
+    public static String humpString(String str)
+    {
+        StringBuilder finalStr = new StringBuilder();
+        String [] arr = str.split("_");
+        for (String s : arr)
+        {
+            String str2 = upFirstCode(s);
+            finalStr.append(str2);
+        }
+        return finalStr.toString();
     }
 
     //转换表字段到字符串的方法
@@ -49,9 +62,8 @@ public class NewTableUtils
                             "import lombok.NoArgsConstructor;\n"+
                             "import lombok.ToString;\n\n"+
                             "@Data\n"+"@AllArgsConstructor\n"+"@NoArgsConstructor\n"+"@ToString\n");
-            //添加类名,首字母要大写（无法设为驼峰，可优化）
-            //首字母大写
-            objStr.append("public class ").append(upFirstCode(fromName)).append("{");
+            //添加类名,首字母要大写（无法将非下划线命名的字段或表名设为驼峰，可优化）
+            objStr.append("public class ").append(humpString(fromName)).append("{");
             String sql = "select * from "+fromName;
             pst = conn.prepareStatement(sql);
             ResultSetMetaData rsMd = pst.executeQuery().getMetaData();
@@ -64,7 +76,7 @@ public class NewTableUtils
                 String[] javaType = className.split("\\.");
                 //拿到分割后的最后的类型，就是字段的数据类型
                 String finalJavaType = javaType[javaType.length - 1];
-                String fieldName = rsMd.getColumnName(i + 1);
+                String fieldName = humpString(rsMd.getColumnName(i + 1));
                 System.out.print((i+1)+"."+"字段名称是："+fieldName+" ");
                 System.out.println("字段类型是："+finalJavaType);
                 objStr.append("\n\tprivate ").append(finalJavaType).append(" ")
@@ -136,7 +148,7 @@ public class NewTableUtils
             }
 
             System.out.println("\n\n该实体类应处于的软件包位置是："+packName);
-            fileOutputStream = new FileOutputStream(path+"\\\\"+upFirstCode(fromName)+".java");
+            fileOutputStream = new FileOutputStream(path+"\\\\"+humpString(fromName)+".java");
             fileOutputStream.write(packName.toString().getBytes());
             fileOutputStream.write(";\n".getBytes());
             fileOutputStream.write(objStr.toString().getBytes());
@@ -171,9 +183,16 @@ public class NewTableUtils
 
     public static void fromToObject()
     {
+        System.out.println("请先导入lombok再使用，若还没有导入，\n再输入连接数据库的名称的时候输入" +
+                "\n 0exit0 \n来退出");
         Scanner sc = new Scanner(System.in);
         System.out.println("请要连接的数据库名");
         String tableName = sc.next();
+        if("0exit0".equals(tableName))
+        {
+            System.out.println("退出成功");
+            System.exit(0);
+        }
         System.out.println("请输入要转化成实体类的表名");
         String fromName = sc.next();
         System.out.println("请输入实体类要存放的路径(绝对路径)");
