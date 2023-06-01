@@ -8,32 +8,32 @@ import java.util.Scanner;
 
 public class TableUtils
 {
-    //该对象用于存放表字段转换成属性的字符串
-    static StringBuilder objStr = new StringBuilder();
-    //该对象用于存放对应的getter、setter字符串
-    static StringBuilder gSMethod = new StringBuilder();
-    //该对象用于存放toString字符串
-    static StringBuilder tSMethod = new StringBuilder("\n\t@Override\n\tpublic String toString() {\n\t\treturn ");
-    //连接数据库的方法
-    public static Connection Conn(String tableName)
-    {
-        String url="jdbc:mysql://localhost:3306/"+tableName+"?userUnicode=true&characterEncoding=utf8";
-        String user="root";
-        String password="123456";
-        Connection connection = null;
-        try
-        {
-            connection =  DriverManager.getConnection(url,user,password);
-            System.out.println("\n==============数据库连接成功==============");
-            return connection;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            System.out.println("\n============连接失败,请查看错误信息============");
-            return connection;
-        }
-    }
+//该对象用于存放表字段转换成属性的字符串
+static StringBuilder objStr = new StringBuilder();
+//该对象用于存放对应的getter、setter字符串
+static StringBuilder gSMethod = new StringBuilder();
+//该对象用于存放toString字符串
+static StringBuilder tSMethod = new StringBuilder("\n\t@Override\n\tpublic String toString() {\n\t\treturn ");
+//连接数据库的方法
+public static Connection Conn(String tableName)
+{
+String url="jdbc:mysql://localhost:3306/"+tableName+"?userUnicode=true&characterEncoding=utf8";
+String user="root";
+String password="123456";
+Connection connection = null;
+try
+{
+connection =  DriverManager.getConnection(url,user,password);
+System.out.println("\n==============数据库连接成功==============");
+return connection;
+}
+catch (Exception e)
+{
+e.printStackTrace();
+System.out.println("\n============连接失败,请查看错误信息============");
+return connection;
+}
+}
 
     //转换表字段到字符串的方法
     public static void getTableField(Connection conn,String fromName)
