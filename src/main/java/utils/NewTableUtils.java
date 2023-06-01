@@ -11,7 +11,7 @@ public class NewTableUtils
 {
     //该对象用于存放表字段转换成属性的字符串
     static StringBuilder objStr = new StringBuilder();
-    public static Connection Conn(String tableName)
+    private static Connection Conn(String tableName)
     {
         String url="jdbc:mysql://localhost:3306/"+tableName+"?userUnicode=true&characterEncoding=utf8";
         String user="root";
@@ -32,14 +32,14 @@ public class NewTableUtils
     }
 
     //首字母大写的方法
-    public static String upFirstCode(String str)
+    private static String upFirstCode(String str)
     {
         return str.substring(0,1).toUpperCase()
                 + str.substring(1);
     }
 
     //下划线命名转化驼峰命名的方法
-    public static String humpString(String str)
+    private static String humpString(String str)
     {
         StringBuilder finalStr = new StringBuilder();
         String [] arr = str.split("_");
@@ -52,7 +52,7 @@ public class NewTableUtils
     }
 
     //转换表字段到字符串的方法
-    public static void getTableField(Connection conn,String fromName)
+    private static void getTableField(Connection conn,String fromName)
     {
         PreparedStatement pst = null;
         try
@@ -121,7 +121,7 @@ public class NewTableUtils
     }
 
     //使用io流，将字符串写入文件输出到磁盘上的方法
-    public static void StrToObject(String path,String fromName)
+    private static void StrToObject(String path,String fromName)
     {
         FileOutputStream fileOutputStream = null;
         try
@@ -181,6 +181,7 @@ public class NewTableUtils
         }
     }
 
+    //暴露给外部的调用方法
     public static void fromToObject()
     {
         System.out.println("请先导入lombok再使用，若还没有导入，\n再输入连接数据库的名称的时候输入" +
