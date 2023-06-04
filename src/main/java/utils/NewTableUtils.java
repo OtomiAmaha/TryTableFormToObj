@@ -39,14 +39,27 @@ public class NewTableUtils
     }
 
     //下划线命名转化驼峰命名的方法
-    private static String humpString(String str)
+    private static String humpString(String str ,Integer type)
     {
         StringBuilder finalStr = new StringBuilder();
         String [] arr = str.split("_");
-        for (String s : arr)
+        if(type==0)
         {
-            String str2 = upFirstCode(s);
-            finalStr.append(str2);
+            for (String s : arr)
+            {
+                String str2 = upFirstCode(s);
+                finalStr.append(str2);
+            }
+        }
+        else if (type==1)
+        {
+            //首字母不大写,先拼接第一个单词（即分割的数组的第0号元素）
+            finalStr.append(arr[0]);
+            for (int i = 1; i < arr.length; i++)
+            {
+                String str2 = upFirstCode(arr[i]);
+                finalStr.append(str2);
+            }
         }
         return finalStr.toString();
     }
@@ -58,12 +71,12 @@ public class NewTableUtils
         try
         {   //先写入导包和注解
             objStr.append("import lombok.AllArgsConstructor;\n"+
-                            "import lombok.Data;\n"+
-                            "import lombok.NoArgsConstructor;\n"+
-                            "import lombok.ToString;\n\n"+
-                            "@Data\n"+"@AllArgsConstructor\n"+"@NoArgsConstructor\n"+"@ToString\n");
+                    "import lombok.Data;\n"+
+                    "import lombok.NoArgsConstructor;\n"+
+                    "import lombok.ToString;\n\n"+
+                    "@Data\n"+"@AllArgsConstructor\n"+"@NoArgsConstructor\n"+"@ToString\n");
             //添加类名,首字母要大写（无法将非下划线命名的字段或表名设为驼峰，可优化）
-            objStr.append("public class ").append(humpString(fromName)).append("{");
+            objStr.append("public class ").append(humpString(fromName,0)).append("{");
             String sql = "select * from "+fromName;
             pst = conn.prepareStatement(sql);
             ResultSetMetaData rsMd = pst.executeQuery().getMetaData();
@@ -76,7 +89,8 @@ public class NewTableUtils
                 String[] javaType = className.split("\\.");
                 //拿到分割后的最后的类型，就是字段的数据类型
                 String finalJavaType = javaType[javaType.length - 1];
-                String fieldName = humpString(rsMd.getColumnName(i + 1));
+                //字段名称，调用转化驼峰命名的方法,使其不会将属性名的首字母大写
+                String fieldName = humpString(rsMd.getColumnName(i + 1),1);
                 System.out.print((i+1)+"."+"字段名称是："+fieldName+" ");
                 System.out.println("字段类型是："+finalJavaType);
                 objStr.append("\n\tprivate ").append(finalJavaType).append(" ")
@@ -148,7 +162,7 @@ public class NewTableUtils
             }
 
             System.out.println("\n\n该实体类应处于的软件包位置是："+packName);
-            fileOutputStream = new FileOutputStream(path+"\\\\"+humpString(fromName)+".java");
+            fileOutputStream = new FileOutputStream(path+"\\\\"+humpString(fromName,0)+".java");
             fileOutputStream.write(packName.toString().getBytes());
             fileOutputStream.write(";\n".getBytes());
             fileOutputStream.write(objStr.toString().getBytes());
